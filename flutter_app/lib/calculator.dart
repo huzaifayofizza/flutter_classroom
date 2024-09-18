@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget
-{
-  State<StatefulWidget> createState() => MyAppState();
+class MyApp extends StatefulWidget {
+  @override
+  State<MyApp> createState() => MyAppState();
 }
 
-class MyAppState extends State<MyApp>
-{
+class MyAppState extends State<MyApp> {
+  final TextEditingController _heightController = TextEditingController();
+  final TextEditingController _weightController = TextEditingController();
+  double? _result;
+  String _statusMessage = '';
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,43 +22,104 @@ class MyAppState extends State<MyApp>
       home: Scaffold(
         appBar: AppBar(
           title: const Text(
-            'My First App',
+            'BMI Calculator',
             style: TextStyle(
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          backgroundColor: Colors.black,),
+          backgroundColor: Colors.black,
+        ),
         body: Container(
-          child: const Column(children: [
-            //Text Feild 1
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Height in m',
-                icon: Icon(Icons.trending_up),
+          // padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.blue, Colors.purple],
+              begin: Alignment.topLeft, // Start gradient from top-left
+              end: Alignment.bottomRight, // End gradient at bottom-right
+            ),
+          ),
+          child: Column(
+            children: [
+              // Text Field 1
+              SizedBox(height: 15),
+              TextField(
+                controller: _heightController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Height in meters (e.g., 1.75)',
+                  icon: Icon(Icons.trending_up),
+                ),
               ),
-            ),
-            SizedBox(height: 15),
-              //Text Feild 2
-             const TextField(
-              decoration: InputDecoration(
-                labelText: 'Weight in kg',
-                icon: Icon(Icons.line_weight),
+              SizedBox(height: 15),
+              // Text Field 2
+              TextField(
+                controller: _weightController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Weight in kg',
+                  icon: Icon(Icons.line_weight),
+                ),
               ),
-            ),
-
-            //button
-            SizedBox(height: 20),
-            ElevatedButton(onPressed: (){}, style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.white,
-              backgroundColor: Colors.black,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4.0),
-              )
-            ),
-            child: Text('Calculate' , style: TextStyle(fontSize: 18))),
-          ]),
+              // Button
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: calculateBMI,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.black,
+                ),
+                child: Text('Calculate', style: TextStyle(fontSize: 18)),
+              ),
+              SizedBox(height: 15),
+              // BMI Result
+              if (_result != null)
+                Text("BMI is: ${_result?.toStringAsFixed(2)}",
+                    style: TextStyle(fontSize: 18)),
+              // Status Message
+              if (_statusMessage.isNotEmpty)
+                Text(
+                  _statusMessage,
+                  style: TextStyle(fontSize: 18, color: Colors.green),
+                ),
+            ],
+          ),
+        ),
       ),
-      )
     );
   }
 
+  void calculateBMI() {
+    String heightInput = _heightController.text.trim();
+    String weightInput = _weightController.text.trim();
+
+    if (heightInput.isEmpty || weightInput.isEmpty) {
+      setState(() {
+        _statusMessage = 'Please enter both height and weight';
+        _result = null;
+      });
+      return;
+    }
+
+    double height = double.parse(heightInput);
+    double weight = double.parse(weightInput);
+
+    // BMI Formula: weight (kg) / [height (m)]^2
+    double heightSquare = height * height;
+    double result = weight / heightSquare;
+    _result = result;
+
+    // BMI status
+    if (result < 18.5) {
+      _statusMessage = 'Underweight';
+    } else if (result >= 18.5 && result < 24.9) {
+      _statusMessage = 'Normal weight';
+    } else if (result >= 25 && result < 29.9) {
+      _statusMessage = 'Overweight';
+    } else {
+      _statusMessage = 'Obese';
+    }
+
+    setState(() {
+      // Update UI after calculation
+    });
+  }
 }
