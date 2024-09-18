@@ -32,9 +32,9 @@ class MyAppState extends State<MyApp> {
           // padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.blue, Colors.purple],
-              begin: Alignment.topLeft, // Start gradient from top-left
-              end: Alignment.bottomRight, // End gradient at bottom-right
+              colors: [Colors.lightGreen, Colors.lightBlue],
+              begin: Alignment.topCenter, // Start gradient from top-left
+              end: Alignment.bottomCenter, // End gradient at bottom-right
             ),
           ),
           child: Column(
@@ -78,7 +78,7 @@ class MyAppState extends State<MyApp> {
               if (_statusMessage.isNotEmpty)
                 Text(
                   _statusMessage,
-                  style: TextStyle(fontSize: 18, color: Colors.green),
+                  style: TextStyle(fontSize: 18, color: Colors.red),
                 ),
             ],
           ),
