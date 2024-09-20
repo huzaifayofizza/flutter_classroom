@@ -24,66 +24,111 @@ class MyAppState extends State<MyApp> {
           title: const Text(
             'BMI Calculator',
             style: TextStyle(
-                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.blueGrey,
         ),
         body: Container(
-          // padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20.0),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.lightGreen, Colors.lightBlue],
-              begin: Alignment.topCenter, // Start gradient from top-left
-              end: Alignment.bottomCenter, // End gradient at bottom-right
+              colors: [Colors.tealAccent.shade100, Colors.blueAccent.shade200],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Text Field 1
-              SizedBox(height: 15),
-              TextField(
-                controller: _heightController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Height in meters (e.g., 1.75)',
-                  icon: Icon(Icons.trending_up),
-                ),
-              ),
-              SizedBox(height: 15),
-              // Text Field 2
-              TextField(
-                controller: _weightController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Weight in kg',
-                  icon: Icon(Icons.line_weight),
-                ),
-              ),
-              // Button
               SizedBox(height: 20),
+              // Height Input Field
+              _buildTextField(
+                controller: _heightController,
+                label: 'Height in meters (e.g., 1.75)',
+                icon: Icons.height,
+              ),
+              SizedBox(height: 20),
+              // Weight Input Field
+              _buildTextField(
+                controller: _weightController,
+                label: 'Weight in kg',
+                icon: Icons.fitness_center,
+              ),
+              SizedBox(height: 30),
+              // Calculate Button
               ElevatedButton(
                 onPressed: calculateBMI,
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  backgroundColor: Colors.blueGrey,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
                 ),
-                child: Text('Calculate', style: TextStyle(fontSize: 18)),
+                child: const Text(
+                  'Calculate BMI',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-              SizedBox(height: 15),
-              // BMI Result
+              SizedBox(height: 25),
+              // BMI Result and Status Message
               if (_result != null)
-                Text("BMI is: ${_result?.toStringAsFixed(2)}",
-                    style: TextStyle(fontSize: 18)),
-              // Status Message
-              if (_statusMessage.isNotEmpty)
-                Text(
-                  _statusMessage,
-                  style: TextStyle(fontSize: 18, color: Colors.red),
+                Column(
+                  children: [
+                    Text(
+                      "BMI: ${_result?.toStringAsFixed(2)}",
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      _statusMessage,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: _getStatusColor(),
+                      ),
+                    ),
+                  ],
                 ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: Colors.blueGrey),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.8),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.blueGrey),
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+      ),
+      style: TextStyle(fontSize: 18),
     );
   }
 
@@ -102,12 +147,9 @@ class MyAppState extends State<MyApp> {
     double height = double.parse(heightInput);
     double weight = double.parse(weightInput);
 
-    // BMI Formula: weight (kg) / [height (m)]^2
-    double heightSquare = height * height;
-    double result = weight / heightSquare;
+    double result = weight / (height * height);
     _result = result;
 
-    // BMI status
     if (result < 18.5) {
       _statusMessage = 'Underweight';
     } else if (result >= 18.5 && result < 24.9) {
@@ -118,8 +160,21 @@ class MyAppState extends State<MyApp> {
       _statusMessage = 'Obese';
     }
 
-    setState(() {
-      // Update UI after calculation
-    });
+    setState(() {});
+  }
+
+  Color _getStatusColor() {
+    if (_result != null) {
+      if (_result! < 18.5) {
+        return Colors.blueAccent;
+      } else if (_result! < 24.9) {
+        return Colors.green;
+      } else if (_result! < 29.9) {
+        return Colors.orange;
+      } else {
+        return Colors.red;
+      }
+    }
+    return Colors.black;
   }
 }
